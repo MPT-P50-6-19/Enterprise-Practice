@@ -548,10 +548,10 @@ namespace Enterprise_Practice
                 SendMessage(email,"Чек на заказ в программе",text);
                 DataBase.addOperation(totalPrice);
                 //Удаление заказа
-                // using (BinaryWriter writer = new BinaryWriter(File.Open(CartList, FileMode.OpenOrCreate)))
-                // {
-                //     writer.Write("");
-                // }
+                using (BinaryWriter writer = new BinaryWriter(File.Open(CartList, FileMode.OpenOrCreate)))
+                {
+                    writer.Write("");
+                }
             }
         }
         

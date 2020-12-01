@@ -165,7 +165,8 @@ namespace Enterprise_Practice
             // res2.Add("code","error");
             // return res2;
             var res = new Dictionary<string, string>();
-            res.Add("type_user","2");
+            res.Add("type_user","4");
+            res.Add("shope","GG");
             res.Add("code","ok");
             return res;
         }

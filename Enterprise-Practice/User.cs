@@ -479,7 +479,8 @@ namespace Enterprise_Practice
 
     public class Seller //Интерфейс Продовца
     {
-        private static List<ProducCart> Getorders() //Возврашет заказы
+        private static string shope = "";
+        private static List<CartClass> Getorders(string shop) //Возврашет заказы
         {
             string text = "";
             bool auth = false;
@@ -498,19 +499,50 @@ namespace Enterprise_Practice
 
             if (auth)
             {
-                return JsonSerializer.Deserialize<List<ProducCart>>(text);
+                var arr =  JsonSerializer.Deserialize<List<CartClass>>(text);
+                var out1 = new List<CartClass>();
+                foreach (var vari in arr)
+                {
+                    if (vari.nameShop==shop)
+                    {
+                        out1.Add(vari);
+                    }
+                }
+
+                return out1;
             }
-            return new List<ProducCart>();
+            return new List<CartClass>();
             
         }
 
-        private static void PushOrders(List<ProducCart> all)
+        private static void PushOrders(List<ProducCart> all, string email)
         {
             if (all.Count()>0)
             {
-                var email = all[0].email;
                 var text = "Чек.\n";
                 var totalPrice = 0;
+                var TF = new Dictionary<string,int>();
+                foreach (var vari in all)
+                {
+                    if (TF.ContainsKey($"{vari.name}|{vari.category}"))
+                    {
+                        TF[vari.name] += 1;
+                    }
+                    else
+                    {
+                        TF.Add($"{vari.name}|{vari.category}",1);
+                    }
+                }
+
+                foreach (var vari in TF)
+                {
+                    var cla = vari.Key.Split('|');
+                    if (Convert.ToInt32(infoProduct(cla[1],cla[0]).count)<vari.Value)
+                    {
+                        return;
+                    }
+                }
+
                 foreach (var vari in all)
                 {
                     text += $"---{vari.name} цена {vari.price} за 1шт.\n";
@@ -520,20 +552,83 @@ namespace Enterprise_Practice
                     DataBase.updateProduct(vari.category,prod.name,prod.price,prod.shelfLife,prod.count);
                 }
                 text += $"\n Итоговая цена: {totalPrice}\nДата заказа:{DateTime.Now}";
-                SendMessage(email,"Чек на заказ в программе",text);
+                //SendMessage(email,"Чек на заказ в программе",text);
                 DataBase.addOperation(totalPrice);
                 //Удаление заказа
+                string text2 = "";
+                using (BinaryReader reader = new BinaryReader(File.Open(CartList, FileMode.Open)))
+                {
+                    if (reader.BaseStream.Length==0)
+                    {
+                        //ig
+                    }
+                    else
+                    {
+                        text2 += reader.ReadString();
+                    }
+                }
+                var arr =  JsonSerializer.Deserialize<List<CartClass>>(text2);
+                var arr2 = new List<CartClass>();
+                foreach (var vari in arr)
+                {
+                    if (vari.email!=email)
+                    {
+                        arr2.Add(vari);
+                    }
+                }
+                var json = JsonSerializer.Serialize(arr2,arr2.GetType());
                 using (BinaryWriter writer = new BinaryWriter(File.Open(CartList, FileMode.OpenOrCreate)))
                 {
-                    writer.Write("");
+                    writer.Write(json);
                 }
             }
         }
-        
-        
-        private static void orders() // Заказы
+
+        private static void ordersALL() // Заказы
         {
-            var all = Getorders();
+            var all = Getorders(shope);
+            var button = new string[all.Count + 1];
+            var doptext = "";
+            if (all.Count()>0)
+            {
+                var i2 = 0;
+                foreach (var vari in all)
+                {
+                    button[i2] = $"{i2 + 1}. {vari.email}";
+                    ++i2;
+                }
+            }
+            else
+            {
+                doptext = "\n Заказов нет";
+            }
+            button[all.Count] = "-Назад";
+            var but = new Button(button);
+            but.text = "Заказ: "+doptext;
+            but.Read_keyAsync();
+            while (true)
+            {
+                but.WriteText();
+                if (but.Click)
+                {
+                    if (but.ClickButton == all.Count)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        orders(all[but.ClickButton].products,all[but.ClickButton].email);
+                    }
+
+                    but.Read_keyAsync();
+                }
+
+                Thread.Sleep(500);
+            }
+        }
+
+        private static void orders(List<ProducCart> all, string email) // Заказы
+        {
             var button = new string[all.Count + 2];
             var doptext = "";
             if (all.Count()>0)
@@ -570,7 +665,7 @@ namespace Enterprise_Practice
                     }
                     else if (but.ClickButton == all.Count)
                     {
-                        PushOrders(all);
+                        PushOrders(all, email);
                         return;
                     }
 
@@ -580,10 +675,11 @@ namespace Enterprise_Practice
                 Thread.Sleep(500);
             }
         }
-        public static void saller_menu() //Меню для Продовца
+        public static void saller_menu(string shopeIN) //Меню для Продовца
         {
+            shope = shopeIN;
             var but = new Button(new[] {"Заказы", "Выйти"});
-            but.text = "Продовец";
+            but.text = $"Продовец Магазин:{shopeIN}";
             but.Read_keyAsync();
             while (true)
             {
@@ -593,7 +689,7 @@ namespace Enterprise_Practice
                     switch (but.ClickButton)
                     {
                         case 0:
-                            orders();
+                            ordersALL();
                             break;
                         case 1: return;
                     }

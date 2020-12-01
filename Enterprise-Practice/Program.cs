@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text.Json;
@@ -31,13 +32,13 @@ namespace Enterprise_Practice
             // test.SalaryPersonnel = 10000;
             // test.SalarySaller = 23000;
             // test.SalaryWarehouse = 5000;
+            // test.budget = 100000;
+            // test.LastSa = new DateTime(2020,12,3);
             // test.products = new List<HistoryOperations>();
             // test.products.Add(new HistoryOperations());
             // test.products[0].totalPrice = 300;
             // test.products[0].data = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;;
             // DataBase.setALLAccounting(test);
-            int x = 500;
-            int y = 87;
             if (File.Exists(pathBuyer))
             {
                 //Buyer.buyer_menu("roman.m2003@yandex.ru");

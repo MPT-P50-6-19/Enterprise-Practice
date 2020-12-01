@@ -105,7 +105,9 @@ namespace Enterprise_Practice
         {
             var vrem = new ProducCart();
             var data = DataBase.infoProduct(category, name);
-            var price = (Convert.ToInt32(data.shelfLife)<=14)? Convert.ToString(Convert.ToInt32(data.price)/2):data.price;
+            var time = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            var srok = (Convert.ToInt32(data.shelfLife) - time)*60*60*24;
+            var price = (srok<=14)? Convert.ToString(Convert.ToInt32(data.price)/2):data.price;
             vrem.category = category;
             vrem.name = name;
             vrem.price = price;
@@ -144,9 +146,11 @@ namespace Enterprise_Practice
             var all = infoCategory(category).products;
             var button = new string[all.Count + 3];
             var i2 = 0;
+            var time = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
             foreach (var vari in all)
             {
-                if (Convert.ToInt32(vari.shelfLife)<=14)
+                var srok = (Convert.ToInt32(vari.shelfLife) - time)*60*60*24;
+                if (srok<=14)
                 {
                     var price = Convert.ToInt32(vari.price)/2;
                     button[i2] = $"{i2 + 1}. {vari.name} | СКИДКА 50% Цена: {price}";
@@ -181,7 +185,7 @@ namespace Enterprise_Practice
             }
         }
         
-        private static void all_сategory()
+        private static void all_сategory(string shop)
         {
             var all = all_category();
             var button = new string[all.Count + 2];
@@ -224,8 +228,19 @@ namespace Enterprise_Practice
         }
         public static void buyer_menu(string emailP) //Меню для Склад
         {
+            var all = getAllShop();
+            var button = new string[all.Count + 3];
+            var i2 = 0;
+            foreach (var vari in all)
+            {
+                button[i2] = $"{i2 + 1}. {vari}";
+                ++i2;
+            }
+            button[all.Count] = "-Корзина";
+            button[all.Count+1] = "-Выйти из аккаунта";
+            button[all.Count+2] = "-Выыйти";
+            var but = new Button(button);
             email = emailP;
-            var but = new Button(new[] {"Категории", "Корзина","Выйти из аккаунта","Выйти"});
             but.text = "Покупатель";
             but.Read_keyAsync();
             while (true)
@@ -233,17 +248,21 @@ namespace Enterprise_Practice
                 but.WriteText();
                 if (but.Click)
                 {
-                    switch (but.ClickButton)
+                    if (but.ClickButton == all.Count)
                     {
-                        case 0:
-                            all_сategory();
-                            break;
-                        case 1:
-                            Cart();
-                            break;
-                        case 2:
-                            Allout();return;
-                        case 3: return;
+                        Cart();return;
+                    }
+                    else if (but.ClickButton == all.Count+1)
+                    {
+                        Allout();return;
+                    }
+                    else if (but.ClickButton == all.Count+2)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        all_сategory(button[but.ClickButton].Split(' ')[1]);
                     }
 
                     but.Read_keyAsync();

@@ -11,19 +11,14 @@ namespace Enterprise_Practice
 {
     public class Admin //Интерфейс админа
     {
-        
-        
         private static void userADD()
         {
             Console.Clear();
-            Console.Write("Введите тип пользователя(2-Кадры, 3-Склад, 4-Кассир, 5-Бухгалтерия, 6-Покупатель): ");
-            var type_user = Console.ReadLine();
             Console.Write("Введите логин: ");
             var login = Console.ReadLine();
             while (!DataBase.checkLogin(login))
             {
                 Console.Clear();
-                Console.WriteLine("Введите тип пользователя(2-Кадры, 3-Склад, 4-Кассир, 5-Бухгалтерия, 6-Покупатель): " + type_user);
                 Console.Write("Введите логин: ");
                 login = Console.ReadLine();
             }
@@ -32,7 +27,6 @@ namespace Enterprise_Practice
             while (!DataBase.checkPassword(password))
             {
                 Console.Clear();
-                Console.WriteLine("Введите тип пользователя(2-Кадры, 3-Склад, 4-Кассир, 5-Бухгалтерия, 6-Покупатель): "+type_user);
                 Console.WriteLine("Введите логин: "+login);
                 Console.Write("Введите пароль: ");
                 password = Console.ReadLine();
@@ -41,38 +35,41 @@ namespace Enterprise_Practice
             var fio = Console.ReadLine();
             Console.Write("Введите возраст: ");
             var age = Console.ReadLine();
-            Console.Write("Введите образование: ");
-            var education = Console.ReadLine();
-            Console.Write("Введите опыт работы: ");
-            var work_experience = Console.ReadLine();
-            var info = $"{fio}|{age}|{education}|{work_experience}";
-            DataBase.add_user(login, password, type_user, info);
+            while (Convert.ToInt32(age)<1960 || Convert.ToInt32(age)>2002)
+            {
+                Console.Clear();
+                Console.WriteLine("Введите логин: "+login);
+                Console.WriteLine("Введите пароль: "+password);
+                Console.WriteLine("Введите ФИО: "+fio);
+                Console.Write("Введите возраст: ");
+                age = Console.ReadLine();
+            }
+            var info = $"{fio}|{age}|null|null";
+            DataBase.add_user(login, password, "0", info);
         }
 
         private static void updateUser(string login)
         {
-            Console.Clear();
-            Console.Write("Введите тип пользователя(2-Кадры, 3-Склад, 4-Кассир, 5-Бухгалтерия, 6-Покупатель): ");
-            var type_user = Console.ReadLine();
-            Console.Write("Введите пароль: ");
-            var password = Console.ReadLine();
-            while (!DataBase.checkPassword(password))
+            var but = new Button(new[] {"Пароль","Фио","Возраст","-Назад"});
+            but.Read_keyAsync();
+            while (true)
             {
-                Console.Clear();
-                Console.WriteLine("Введите тип пользователя(2-Кадры, 3-Склад, 4-Кассир, 5-Бухгалтерия, 6-Покупатель): "+type_user);
-                Console.Write("Введите пароль: ");
-                password = Console.ReadLine();
+                but.WriteText();
+                if (but.Click)
+                {
+                    switch (but.ClickButton)
+                    {
+                        case 0:RedInfo.upPassword(login); break;
+                        case 1: RedInfo.upFio(login);break;
+                        case 2: RedInfo.upAge(login);break;
+                        case 3: return;
+                    }
+
+                    but.Read_keyAsync();
+                }
+
+                Thread.Sleep(500);
             }
-            Console.Write("Введите ФИО: ");
-            var fio = Console.ReadLine();
-            Console.Write("Введите возраст: ");
-            var age = Console.ReadLine();
-            Console.Write("Введите образование: ");
-            var education = Console.ReadLine();
-            Console.Write("Введите опыт работы: ");
-            var work_experience = Console.ReadLine();
-            var info = $"{fio}|{age}|{education}|{work_experience}";
-            DataBase.update_user(login, password, type_user, info);
         }
 
         private static void userRed(string login)
@@ -176,57 +173,33 @@ namespace Enterprise_Practice
 
     public class Personnel //Интерфейс Кадры
     {
-        
-        private static void userADD()
-        {
-            Console.Clear();
-            Console.Write("Введите тип пользователя(2-Кадры, 3-Склад, 4-Кассир, 5-Бухгалтерия, 6-Покупатель): ");
-            var type_user = Console.ReadLine();
-            Console.Write("Введите логин: ");
-            var login = Console.ReadLine();
-            while (!DataBase.checkLogin(login))
-            {
-                Console.Clear();
-                Console.WriteLine("Введите тип пользователя(2-Кадры, 3-Склад, 4-Кассир, 5-Бухгалтерия, 6-Покупатель): " + type_user);
-                Console.Write("Введите логин: ");
-                login = Console.ReadLine();
-            }
-            Console.Write("Введите пароль: ");
-            var password = Console.ReadLine();
-            while (!DataBase.checkPassword(password))
-            {
-                Console.Clear();
-                Console.WriteLine("Введите тип пользователя(2-Кадры, 3-Склад, 4-Кассир, 5-Бухгалтерия, 6-Покупатель): "+type_user);
-                Console.WriteLine("Введите логин: "+login);
-                Console.Write("Введите пароль: ");
-                password = Console.ReadLine();
-            }
-            Console.Write("Введите ФИО: ");
-            var fio = Console.ReadLine();
-            Console.Write("Введите возраст: ");
-            var age = Console.ReadLine();
-            Console.Write("Введите образование: ");
-            var education = Console.ReadLine();
-            Console.Write("Введите опыт работы: ");
-            var work_experience = Console.ReadLine();
-            var info = $"{fio}|{age}|{education}|{work_experience}";
-            DataBase.add_user(login, password, type_user, info);
-        }
         private static void updateUser(string login)
         {
-            Console.Clear();
-            Console.Write("Введите тип пользователя(2-Кадры, 3-Склад, 4-Кассир, 5-Бухгалтерия): ");
-            var type_user = Console.ReadLine();
-            Console.Write("Введите ФИО: ");
-            var fio = Console.ReadLine();
-            Console.Write("Введите возраст: ");
-            var age = Console.ReadLine();
-            Console.Write("Введите образование: ");
-            var education = Console.ReadLine();
-            Console.Write("Введите опыт работы: ");
-            var work_experience = Console.ReadLine();
-            var info = $"{fio}|{age}|{education}|{work_experience}";
-            DataBase.update_user(login, DataBase.info_user(login)["password"], type_user, info);
+            var inf = info_user(login);
+            var button = (inf["type_user"] == "4") ?new[] {"Тип пользователя","ФИО","возраст","образование","опыт работы","-Назад","магазин"}:new[] {"Тип пользователя","ФИО","возраст","образование","опыт работы","-Назад"};
+            var but = new Button(button);
+            but.Read_keyAsync();
+            while (true)
+            {
+                but.WriteText();
+                if (but.Click)
+                {
+                    switch (but.ClickButton)
+                    {
+                        case 0:RedInfo.upTypeUser(login); break;
+                        case 1: RedInfo.upFio(login);break;
+                        case 2: RedInfo.upAge(login);break;
+                        case 3: RedInfo.upEducation(login);break;
+                        case 4: RedInfo.upWorkExperience(login);break;
+                        case 5: return;
+                        case 6: RedInfo.upShop(login);break;
+                    }
+
+                    but.Read_keyAsync();
+                }
+
+                Thread.Sleep(500);
+            }
         }
 
         private static void userRed(string login)
@@ -253,25 +226,20 @@ namespace Enterprise_Practice
                 Thread.Sleep(500);
             }
         }
-
-
         private static void all_user_personnel()
         {
             var all = all_user();
-            var button = new string[all.Count + 1];
+            var button = new string[all.Count];
             var i2 = 0;
             foreach (var vari in all)
             {
                 if (vari["type_user"] != "1" && vari["type_user"] != "6")
                 {
-                    button[i2] = $"{i2 + 1}. {vari["login"]}";
+                    button[i2] = (vari["type_user"]=="0")? $"{i2 + 1}. {vari["login"]} | Без работы":$"{i2 + 1}. {vari["login"]}";
                     ++i2;
                 }
-
             }
-
-            button[all.Count - 1] = "-Добавить";
-            button[all.Count] = "-Назад";
+            button[all.Count-1] = "-Назад";
             var but = new Button(button);
             but.Read_keyAsync();
             while (true)
@@ -279,13 +247,9 @@ namespace Enterprise_Practice
                 but.WriteText();
                 if (but.Click)
                 {
-                    if (but.ClickButton == all.Count)
+                    if (but.ClickButton == all.Count-1)
                     {
                         return;
-                    }
-                    else if (but.ClickButton == all.Count - 1)
-                    {
-                        userADD();
                     }
                     else
                     {
@@ -334,23 +298,35 @@ namespace Enterprise_Practice
             var nameProduct = Console.ReadLine();
             Console.Write("Цена: ");
             var price = Console.ReadLine();
-            Console.Write("Срок годности: ");
-            var shelfLife = Console.ReadLine();
+            Console.Write("Срок годности в днях: ");
+            var shelfLife = Convert.ToInt32(Console.ReadLine());
+            var time = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds + shelfLife*24*60*60;
             Console.Write("Количество: ");
             var count = Console.ReadLine();
-            DataBase.addProduct(category,nameProduct,price,shelfLife,count);
+            DataBase.addProduct(category,nameProduct,price,Convert.ToString(time),count);
         }
         
         private static void changeProduct(string category,string nameProduct)
         {
-            Console.Clear();
-            Console.Write("Цена: ");
-            var price = Console.ReadLine();
-            Console.Write("Срок годности: ");
-            var shelfLife = Console.ReadLine();
-            Console.Write("Количество: ");
-            var count = Console.ReadLine();
-            DataBase.updateProduct(category,nameProduct,price,shelfLife,count);
+            var but = new Button(new[] {"Цена","Срок годности","Количество","-Назад"});
+            but.Read_keyAsync();
+            while (true)
+            {
+                but.WriteText();
+                if (but.Click)
+                {
+                    switch (but.ClickButton)
+                    {
+                        case 0:RedInfo.upPrice(category,nameProduct); break;
+                        case 1: RedInfo.upShelfLife(category,nameProduct);break;
+                        case 2: RedInfo.upCount(category,nameProduct);break;
+                        case 3: return;
+                    }
+
+                    but.Read_keyAsync();
+                }
+                Thread.Sleep(500);
+            }
         }
         
         private static void redProduct(string category,string name)
@@ -393,7 +369,7 @@ namespace Enterprise_Practice
             var i2 = 0;
             foreach (var vari in all)
             {
-                button[i2] = $"{i2 + 1}. {vari.name}";
+                button[i2] = $"{i2 + 1}. {vari.name} | {vari.count}";
                 ++i2;
             }
             button[all.Count] = "-Добавить товар";
@@ -503,7 +479,6 @@ namespace Enterprise_Practice
 
     public class Seller //Интерфейс Продовца
     {
-        public static string CartList = "C:/Users/79096/RiderProjects/ElectronicJournal/CartList.dat";
         private static List<ProducCart> Getorders() //Возврашет заказы
         {
             string text = "";
@@ -568,7 +543,7 @@ namespace Enterprise_Practice
                 foreach (var vari in all)
                 {
                     var info = DataBase.infoProduct(vari.category,vari.name);
-                    button[i2] = $"{i2 + 1}. {vari.name} | Цена: {vari.price} | На складе {info.shelfLife}";
+                    button[i2] = $"{i2 + 1}. {vari.name} | Цена: {vari.price} | На складе {info.count}";
                     ++i2;
                     totalPrice += Convert.ToInt32(vari.price);
                 }
@@ -638,9 +613,8 @@ namespace Enterprise_Practice
         {
             var salary2 = Convert.ToDouble(salary);
             var salarySave = salary2;
-            salary2 += Math.Round((double)(salarySave * 22 / 100));
-            salary2 += Math.Round((double)(salarySave * 5.1 / 100));
-            salary2 += Math.Round((double)(salarySave * 2.9 / 100));
+            salary2 += Math.Round((double)(salarySave * 0.2 / 100));
+            salary2 += Math.Round((double)(salarySave * 6 / 100));
             return salary2;
         }
         
@@ -812,19 +786,51 @@ namespace Enterprise_Practice
         
         private static void updateSalary()
         {
-            Console.Clear();
-            Console.Write("Введите зарплату Кадров: ");
-            var SalaryPersonnel =  Convert.ToInt32(Console.ReadLine());
-            Console.Write("Введите зарплату Кладовщиков: ");
-            var SalarySaller =  Convert.ToInt32(Console.ReadLine());
-            Console.Write("Введите зарплату Прадовцов: ");
-            var SalaryWarehouse = Convert.ToInt32(Console.ReadLine());
-            DataBase.updateSalary(SalaryPersonnel,SalarySaller,SalaryWarehouse);
+            var but = new Button(new[] {"Кадров","Кладовщиков","Прадовцов","-Назад"});
+            but.Read_keyAsync();
+            while (true)
+            {
+                but.WriteText();
+                if (but.Click)
+                {
+                    switch (but.ClickButton)
+                    {
+                        case 0:RedInfo.upSalaryPersonnel(); break;
+                        case 1: RedInfo.upSalarySaller();break;
+                        case 2: RedInfo.upSalaryWarehouse();break;
+                        case 5: return;
+                    }
+
+                    but.Read_keyAsync();
+                }
+
+                Thread.Sleep(500);
+            }
         }
         public static void accountant_menu() //Меню для Бухгалтера
         {
+            var info = getSalaryANDOperations();
+            if (DateTime.Now>info.LastSa)
+            {
+                var all2 = getALLUser();
+                var paymentAll = 0.0;
+                foreach (var vari in all2)
+                {
+                    var payment = 0;
+                    switch (vari["type_user"])
+                    {
+                        case "2": payment = info.SalaryPersonnel;break;
+                        case "3": payment = info.SalaryWarehouse;break;
+                        case "4": payment = info.SalarySaller;break;
+                    }
+                    paymentAll += Payroll(payment);
+                }
+                info.LastSa = info.LastSa.AddMonths(1);
+                info.budget = info.budget-(int)paymentAll;
+                setALLAccounting(info);
+            }
             var but = new Button(new[] {"Статистика за день","Статистика за месяц","Статистика за полгода","Статистика за год","Изменить зарплаты","Выйти"});
-            but.text = "Бухгалтер";
+            but.text = $"Бухгалтер {info.budget}р.";
             but.Read_keyAsync();
             while (true)
             {

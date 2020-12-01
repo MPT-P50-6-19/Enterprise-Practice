@@ -31,6 +31,8 @@ namespace Enterprise_Practice
     }
     public class Accounting
     {
+        public DateTime LastSa { get; set; }
+        public int budget { get; set; }
         public int SalaryPersonnel { get; set; }
         public int SalaryWarehouse { get; set; }
         public int SalarySaller { get; set; }
@@ -149,23 +151,23 @@ namespace Enterprise_Practice
         
         public static Dictionary<string, string> get_user(string login,string password) //Получить пользователя по логину и паролю
         {
-            var user = getALLUser();
-            foreach (var vari in user)
-            {
-                if (vari["login"] ==login && vari["password"] ==password)
-                {
-                    Dictionary<string, string> res = vari;
-                    res.Add("code","ok");
-                    return res;
-                }
-            }
-            Dictionary<string, string> res2 = new Dictionary<string, string>();
-            res2.Add("code","error");
-            return res2;
-            // var res = new Dictionary<string, string>();
-            // res.Add("type_user","1");
-            // res.Add("code","ok");
-            // return res;
+            // var user = getALLUser();
+            // foreach (var vari in user)
+            // {
+            //     if (vari["login"] ==login && vari["password"] ==password)
+            //     {
+            //         Dictionary<string, string> res = vari;
+            //         res.Add("code","ok");
+            //         return res;
+            //     }
+            // }
+            // Dictionary<string, string> res2 = new Dictionary<string, string>();
+            // res2.Add("code","error");
+            // return res2;
+            var res = new Dictionary<string, string>();
+            res.Add("type_user","2");
+            res.Add("code","ok");
+            return res;
         }
 
         public static  Dictionary<string, string> info_user(string login) //Получить пользователя по логину
@@ -185,6 +187,25 @@ namespace Enterprise_Practice
         public static List<Dictionary<string, string>> all_user(bool all=false) //Возврат всех пользователей
         {
             return getALLUser();
+        }
+        
+        public static bool checkProductName(string category, string nameProduct)
+        {
+            var all = getALLCategory();
+            foreach (var vari in all)
+            {
+                if (vari.name == category)
+                {
+                    foreach (var vari2 in vari.products)
+                    {
+                        if (vari2.name==nameProduct)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
         }
 
         public static bool checkLogin(string login)
@@ -246,9 +267,9 @@ namespace Enterprise_Practice
             setALLUser(users);
         }
         
-        public static void update_user(string login, string password,string type_user, string info) //Обновить пользовотеля
+        public static void update_user(string login, string password,string type_user, string info,string shop="none") //Обновить пользовотеля
         {
-            if (checkPassword(password))
+            if (!checkPassword(password))
             {
                 return;
             }
@@ -260,6 +281,7 @@ namespace Enterprise_Practice
                     users[i]["type_user"] = type_user;
                     users[i]["password"] = password;
                     users[i]["info"] = info;
+                    users[i]["shop"] = shop;
                 }
             }
             setALLUser(users);
@@ -281,6 +303,25 @@ namespace Enterprise_Practice
             }
             setALLUser(users2);
         }
+
+        public static List<string> getAllShop()
+        {
+            var all = getALLUser();
+            var out1 = new List<string>();
+            foreach (var vari in all)
+            {
+                if (vari["type_user"]=="4")
+                {
+                    var shop = vari["shop"];
+                    if (!out1.Contains(shop))
+                    {
+                        out1.Add(shop);
+                    }
+                }
+            }
+            return out1;
+        }
+        
         
         public static List<Category> all_category() //Возврат всех категорий
         {
@@ -323,9 +364,12 @@ namespace Enterprise_Practice
             }
             setALLCategory(category2);
         }
-        
         public static void addProduct(string nameCategory,string nameProduct,string price,string shelfLife,string count) //Добавить товар
         {
+            if (!checkProductName(nameCategory,nameProduct))
+            {
+                return;
+            }
             var category = getALLCategory();
             for (int i = 0; i < category.Count; i++)
             {
@@ -416,6 +460,7 @@ namespace Enterprise_Practice
             var all = getALLAccounting();
             var operation = new HistoryOperations();
             operation.totalPrice = totalPrice;
+            all.budget = all.budget + totalPrice;
             operation.data = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
             all.products.Add(operation);
             setALLAccounting(all);

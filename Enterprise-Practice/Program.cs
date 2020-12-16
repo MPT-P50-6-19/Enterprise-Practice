@@ -87,7 +87,7 @@ namespace Enterprise_Practice
                     case 1: Admin.admin_menu();return;
                     case 2: Personnel.personnel_menu();return;
                     case 3: Warehouse.warehouse_menu();return;
-                    case 4: Seller.saller_menu(user["shope"]);return;
+                    case 4: Seller.saller_menu(user["shop"]);return;
                     case 5: Accountant.accountant_menu();return;
                 }
             }
